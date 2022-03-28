@@ -9,6 +9,7 @@ import (
 
 var ErrShortenedWord = fmt.Errorf("cannot understand words with '")
 var ErrContainsDigits = fmt.Errorf("cannot understand words with digits")
+var ErrEmptyWord = fmt.Errorf("cannot translate empty words")
 
 type gopherTranslator struct {
 	translatorRules []*translatorRule
@@ -39,7 +40,7 @@ func (t *gopherTranslator) Translate(word string) (string, error) {
 			}
 		}
 	}
-	return word, nil
+	return word, ErrEmptyWord
 }
 
 func containsNumber(word string) bool {

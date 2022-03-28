@@ -44,6 +44,7 @@ func TestGopherTranslatorErrors(t *testing.T) {
 		{"don't", ErrShortenedWord},
 		{"shouldn't", ErrShortenedWord},
 		{"5asdfhg61261611", ErrContainsDigits},
+		{"", ErrEmptyWord},
 	}
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
