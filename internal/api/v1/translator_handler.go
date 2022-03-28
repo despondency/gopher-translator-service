@@ -6,6 +6,22 @@ import (
 	"net/http"
 )
 
+type GopherSentenceRequest struct {
+	EnglishSentence string `json:"english_sentence"`
+}
+
+type GopherSentenceResponse struct {
+	GopherSentence string `json:"gopher_sentence"`
+}
+
+type GopherWordRequest struct {
+	EnglishWord string `json:"english_word"`
+}
+
+type GopherWordResponse struct {
+	GopherWord string `json:"gopher_word"`
+}
+
 type TranslatorHandler struct {
 	t translator.Translator
 }
