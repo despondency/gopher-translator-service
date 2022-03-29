@@ -11,7 +11,7 @@ func TestGopherTranslatorTranslate(t *testing.T) {
 	translator := NewGopherTranslator(history.NewHistoryService())
 	ctx := context.Background()
 	var tests = []struct {
-		actual, expected string
+		input, expected string
 	}{
 		{"apple", "gapple"},
 		{"Apple", "gApple"},
@@ -33,9 +33,9 @@ func TestGopherTranslatorTranslate(t *testing.T) {
 		{"Aaaaplequ", "gAaaaplequ"},
 	}
 	for _, tt := range tests {
-		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
+		testName := fmt.Sprintf("%s,%s", tt.input, tt.expected)
 		t.Run(testName, func(t *testing.T) {
-			translation, err := translator.Translate(ctx, tt.actual)
+			translation, err := translator.Translate(ctx, tt.input)
 			if err != nil {
 				t.Errorf(err.Error())
 				t.FailNow()
@@ -51,7 +51,7 @@ func TestGopherTranslatorTranslateSentence(t *testing.T) {
 	translator := NewGopherTranslator(history.NewHistoryService())
 	ctx := context.Background()
 	var tests = []struct {
-		actual, expected string
+		input, expected string
 	}{
 		{"apple ear oak user xray chair square xxxxxxxxqqu aaaaplequ!",
 			"gapple gear goak guser gexray airchogo aresquogo xxxxxxxxqquogo gaaaaplequ!"},
@@ -59,9 +59,9 @@ func TestGopherTranslatorTranslateSentence(t *testing.T) {
 			"gApples owgrogo gon eestrogo."},
 	}
 	for _, tt := range tests {
-		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
+		testName := fmt.Sprintf("%s,%s", tt.input, tt.expected)
 		t.Run(testName, func(t *testing.T) {
-			translation, err := translator.TranslateSentence(ctx, tt.actual)
+			translation, err := translator.TranslateSentence(ctx, tt.input)
 			if err != nil {
 				t.Errorf(err.Error())
 				t.FailNow()
@@ -69,19 +69,7 @@ func TestGopherTranslatorTranslateSentence(t *testing.T) {
 			if translation != tt.expected {
 				t.Errorf("expected %s, got %s", translation, tt.expected)
 			}
-			//compareSentences(t, translation, tt.expected)
 		})
-	}
-}
-
-func compareSentences(t *testing.T, actual []string, expected []string) {
-	if len(actual) != len(expected) {
-		t.Errorf("len of the expected sentances and actual is not equal, expected is %d, actual is %d", len(expected), len(actual))
-	}
-	for i, actualWord := range actual {
-		if actualWord != expected[i] {
-			t.Errorf("actual is %s, expected is %s", actualWord, expected[i])
-		}
 	}
 }
 
@@ -89,7 +77,7 @@ func TestGopherTranslatorTranslateErrors(t *testing.T) {
 	translator := NewGopherTranslator(history.NewHistoryService())
 	ctx := context.Background()
 	var tests = []struct {
-		actual   string
+		input    string
 		expected error
 	}{
 		{"don't", ErrShortenedWord},
@@ -98,9 +86,9 @@ func TestGopherTranslatorTranslateErrors(t *testing.T) {
 		{"", ErrEmptyWord},
 	}
 	for _, tt := range tests {
-		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
+		testName := fmt.Sprintf("%s,%s", tt.input, tt.expected)
 		t.Run(testName, func(t *testing.T) {
-			_, err := translator.Translate(ctx, tt.actual)
+			_, err := translator.Translate(ctx, tt.input)
 			if err == nil {
 				t.Errorf("expects an error to occur")
 				t.FailNow()
@@ -116,15 +104,15 @@ func TestGopherTranslatorTranslateSentenceErrors(t *testing.T) {
 	translator := NewGopherTranslator(history.NewHistoryService())
 	ctx := context.Background()
 	var tests = []struct {
-		actual   string
+		input    string
 		expected error
 	}{
 		{"heeeey its me", ErrInvalidSentence},
 	}
 	for _, tt := range tests {
-		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
+		testName := fmt.Sprintf("%s,%s", tt.input, tt.expected)
 		t.Run(testName, func(t *testing.T) {
-			_, err := translator.TranslateSentence(ctx, tt.actual)
+			_, err := translator.TranslateSentence(ctx, tt.input)
 			if err == nil {
 				t.Errorf("expects an error to occur")
 				t.FailNow()

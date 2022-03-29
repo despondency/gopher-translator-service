@@ -1,8 +1,11 @@
 test:
 	go test ./...
 
+test-unit:
+	go test ./... -run ./internal
+
 test-integration:
-	go test ./... -run ./integration-test
+	make build-image && go test ./... -run ./integration-test
 
 build-image:
 	docker build . -f build/Dockerfile -t gopher-translator-service:1.0

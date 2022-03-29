@@ -18,7 +18,7 @@ func SetupService(ctx context.Context) (*serviceContainer, error) {
 		Image:           "gopher-translator-service:1.0",
 		AutoRemove:      true,
 		ExposedPorts:    []string{"8080/tcp"},
-		WaitingFor:      wait.ForHTTP("/health").WithPort("8080"),
+		WaitingFor:      wait.ForHTTP("/v1/health").WithPort("8080"),
 	}
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,

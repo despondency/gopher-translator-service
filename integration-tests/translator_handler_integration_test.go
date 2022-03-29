@@ -1,13 +1,11 @@
 package integration_tests
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
+	testClientV1 "gopher-translator-service/integration-tests/client/v1"
 	"gopher-translator-service/integration-tests/helper"
 	v1 "gopher-translator-service/internal/api/v1"
-	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -17,34 +15,28 @@ func TestTranslateWord(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	translateWord := &v1.GopherWordRequest{
-		EnglishWord: "apple",
+	testClient := testClientV1.NewTestClient()
+	var tests = []struct {
+		input    *v1.GopherWordRequest
+		expected *v1.GopherWordResponse
+	}{
+		{
+			input: &v1.GopherWordRequest{
+				EnglishWord: "apple",
+			},
+			expected: &v1.GopherWordResponse{
+				GopherWord: "gapple",
+			},
+		},
 	}
-	b, err := json.Marshal(translateWord)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	body := bytes.NewBuffer(b)
-	//Leverage Go's HTTP Post function to make request
-	resp, err := http.Post(fmt.Sprintf(container.URI+"/word"), "application/json", body)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer func() {
-		resp.Body.Close()
-	}()
-	//Read the response body
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	translatedWord := &v1.GopherWordResponse{}
-	err = json.Unmarshal(respBody, translatedWord)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if translatedWord.GopherWord != "gapple" {
-		t.Errorf("expected %s, got %s", "gapple", translatedWord.GopherWord)
+	for _, tt := range tests {
+		resp, err := testClient.Translate(container.URI, tt.input)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		if *resp != *tt.expected {
+			t.Errorf("expected %v, got %v", tt.expected, resp)
+		}
 	}
 	container.Terminate(context.Background())
 }
@@ -54,34 +46,37 @@ func TestTranslateSentence(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	translateWord := &v1.GopherSentenceRequest{
-		EnglishSentence: "Apples grow on trees.",
+	testClient := testClientV1.NewTestClient()
+	var tests = []struct {
+		input    *v1.GopherSentenceRequest
+		expected *v1.GopherSentenceResponse
+	}{
+		{
+			input: &v1.GopherSentenceRequest{
+				EnglishSentence: "Apples grow on trees.",
+			},
+			expected: &v1.GopherSentenceResponse{
+				GopherSentence: "gApples owgrogo gon eestrogo.",
+			},
+		},
 	}
-	b, err := json.Marshal(translateWord)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	body := bytes.NewBuffer(b)
-	//Leverage Go's HTTP Post function to make request
-	resp, err := http.Post(fmt.Sprintf(container.URI+"/sentence"), "application/json", body)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	defer func() {
-		resp.Body.Close()
-	}()
-	//Read the response body
-	respBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	translatedWord := &v1.GopherWordResponse{}
-	err = json.Unmarshal(respBody, translatedWord)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	if translatedWord.GopherWord != "gApples owgrogo gon eestrogo." {
-		t.Errorf("expected %s, got %s", "gapple", translatedWord.GopherWord)
+	for _, tt := range tests {
+		resp, err := testClient.TranslateSentence(container.URI, tt.input)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		if *resp != *tt.expected {
+			t.Errorf("expected %v, got %v", tt.expected, resp)
+		}
 	}
 	container.Terminate(context.Background())
+}
+
+func statusOK() func(status int) error {
+	return func(status int) error {
+		if status != http.StatusOK {
+			return fmt.Errorf("expected status OK")
+		}
+		return nil
+	}
 }

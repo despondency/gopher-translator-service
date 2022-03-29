@@ -87,8 +87,8 @@ func (th *TranslatorHandler) TranslateSentence() echo.HandlerFunc {
 		if err != nil {
 			return c.NoContent(http.StatusBadRequest)
 		}
-		var gopherWordResponse GopherWordResponse
-		gopherWordResponse.GopherWord = translation
+		var gopherWordResponse GopherSentenceResponse
+		gopherWordResponse.GopherSentence = translation
 		return c.JSON(http.StatusOK, &gopherWordResponse)
 	}
 }

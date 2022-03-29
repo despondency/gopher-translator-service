@@ -26,10 +26,10 @@ func (s *Server) Run() {
 	translatorSvc := translator.NewGopherTranslator(history.NewHistoryService())
 	translatorHandler := v1.NewTranslatorHandler(translatorSvc)
 	historyHandler := v1.NewHistoryHandler(historySvc)
-	s.e.Add(echo.GET, "/health", createHealth())
-	s.e.Add(echo.POST, "/word", translatorHandler.TranslateWord())
-	s.e.Add(echo.POST, "/sentence", translatorHandler.TranslateSentence())
-	s.e.Add(echo.GET, "/history", historyHandler.GetTranslationHistory())
+	s.e.Add(echo.GET, "/v1/health", createHealth())
+	s.e.Add(echo.POST, "/v1/word", translatorHandler.TranslateWord())
+	s.e.Add(echo.POST, "/v1/sentence", translatorHandler.TranslateSentence())
+	s.e.Add(echo.GET, "/v1/history", historyHandler.GetTranslationHistory())
 	log.Fatalln(s.e.Start(":8080"))
 }
 
