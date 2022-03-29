@@ -1,29 +1,41 @@
 package translator
 
 import (
+	"context"
 	"fmt"
+	"gopher-translator-service/internal/history"
 	"testing"
 )
 
-func TestGopherTranslator_Translate(t *testing.T) {
-	translator := NewGopherTranslator(NewHistoryService())
+func TestGopherTranslatorTranslate(t *testing.T) {
+	translator := NewGopherTranslator(history.NewHistoryService())
+	ctx := context.Background()
 	var tests = []struct {
 		actual, expected string
 	}{
 		{"apple", "gapple"},
+		{"Apple", "gApple"},
 		{"ear", "gear"},
+		{"Ear", "gEar"},
 		{"oak", "goak"},
+		{"Oak", "gOak"},
 		{"user", "guser"},
+		{"User", "gUser"},
 		{"xray", "gexray"},
+		{"XRay", "geXRay"},
 		{"chair", "airchogo"},
+		{"Chair", "airChogo"},
 		{"square", "aresquogo"},
+		{"Square", "areSquogo"},
 		{"xxxxxxxxqqu", "xxxxxxxxqquogo"},
+		{"Xxxxxxxxqqu", "Xxxxxxxxqquogo"},
 		{"aaaaplequ", "gaaaaplequ"},
+		{"Aaaaplequ", "gAaaaplequ"},
 	}
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
 		t.Run(testName, func(t *testing.T) {
-			translation, err := translator.Translate(tt.actual)
+			translation, err := translator.Translate(ctx, tt.actual)
 			if err != nil {
 				t.Errorf(err.Error())
 				t.FailNow()
@@ -35,23 +47,29 @@ func TestGopherTranslator_Translate(t *testing.T) {
 	}
 }
 
-func TestGopherTranslator_TranslateSentence(t *testing.T) {
-	translator := NewGopherTranslator(NewHistoryService())
+func TestGopherTranslatorTranslateSentence(t *testing.T) {
+	translator := NewGopherTranslator(history.NewHistoryService())
+	ctx := context.Background()
 	var tests = []struct {
-		actual, expected []string
+		actual, expected string
 	}{
-		{[]string{"apple", "ear", "oak", "user", "xray", "chair", "square", "xxxxxxxxqqu", "aaaaplequ"},
-			[]string{"gapple", "gear", "goak", "guser", "gexray", "airchogo", "aresquogo", "xxxxxxxxqquogo", "gaaaaplequ"}},
+		{"apple ear oak user xray chair square xxxxxxxxqqu aaaaplequ!",
+			"gapple gear goak guser gexray airchogo aresquogo xxxxxxxxqquogo gaaaaplequ!"},
+		{"Apples grow on trees.",
+			"gApples owgrogo gon eestrogo."},
 	}
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
 		t.Run(testName, func(t *testing.T) {
-			translation, err := translator.TranslateSentence(tt.actual)
+			translation, err := translator.TranslateSentence(ctx, tt.actual)
 			if err != nil {
 				t.Errorf(err.Error())
 				t.FailNow()
 			}
-			compareSentences(t, translation, tt.expected)
+			if translation != tt.expected {
+				t.Errorf("expected %s, got %s", translation, tt.expected)
+			}
+			//compareSentences(t, translation, tt.expected)
 		})
 	}
 }
@@ -67,8 +85,9 @@ func compareSentences(t *testing.T, actual []string, expected []string) {
 	}
 }
 
-func TestGopherTranslatorErrors(t *testing.T) {
-	translator := NewGopherTranslator(NewHistoryService())
+func TestGopherTranslatorTranslateErrors(t *testing.T) {
+	translator := NewGopherTranslator(history.NewHistoryService())
+	ctx := context.Background()
 	var tests = []struct {
 		actual   string
 		expected error
@@ -81,7 +100,31 @@ func TestGopherTranslatorErrors(t *testing.T) {
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
 		t.Run(testName, func(t *testing.T) {
-			_, err := translator.Translate(tt.actual)
+			_, err := translator.Translate(ctx, tt.actual)
+			if err == nil {
+				t.Errorf("expects an error to occur")
+				t.FailNow()
+			}
+			if err != tt.expected {
+				t.Errorf("got %s, want %s", err, tt.expected)
+			}
+		})
+	}
+}
+
+func TestGopherTranslatorTranslateSentenceErrors(t *testing.T) {
+	translator := NewGopherTranslator(history.NewHistoryService())
+	ctx := context.Background()
+	var tests = []struct {
+		actual   string
+		expected error
+	}{
+		{"heeeey its me", ErrInvalidSentence},
+	}
+	for _, tt := range tests {
+		testName := fmt.Sprintf("%s,%s", tt.actual, tt.expected)
+		t.Run(testName, func(t *testing.T) {
+			_, err := translator.TranslateSentence(ctx, tt.actual)
 			if err == nil {
 				t.Errorf("expects an error to occur")
 				t.FailNow()

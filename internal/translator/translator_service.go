@@ -1,64 +1,68 @@
 package translator
 
 import (
+	"context"
 	"fmt"
+	"gopher-translator-service/internal/history"
 	"strings"
 	"unicode"
 )
 
-type StorageManager interface {
-	Store(word, translated string)
-	Get(word string) (string, bool)
-}
-
-type TranslatedWord struct {
-	Word        string
-	Translation string
-}
-
-type HistoryManager interface {
-	Add(word, translation string)
-	Fetch() []*TranslatedWord
-}
-
 var ErrShortenedWord = fmt.Errorf("cannot understand words with '")
 var ErrContainsDigits = fmt.Errorf("cannot understand words with digits")
 var ErrEmptyWord = fmt.Errorf("cannot translate empty words")
+var ErrInvalidSentence = fmt.Errorf("sentence does not end in (.?!)")
 
 type gopherTranslator struct {
 	translatorRules []*translatorRule
-	historySvc      HistoryManager
+	historySvc      history.Manager
 }
 
-func (t *gopherTranslator) TranslateSentence(sentence []string) ([]string, error) {
-	translatedWords := make([]string, len(sentence))
-	for i, word := range sentence {
-		currentTranslatedWord, err := t.Translate(word)
+func (t *gopherTranslator) TranslateSentence(ctx context.Context, sentence string) (string, error) {
+	if !strings.HasSuffix(sentence, "!") && !strings.HasSuffix(sentence, "?") && !strings.HasSuffix(sentence, ".") {
+		return "", ErrInvalidSentence
+	}
+	endsWith := []rune(sentence)
+	end := endsWith[len(sentence)-1]
+	newSentence := strings.ReplaceAll(sentence, string(end), "")
+	sentenceWords := strings.Fields(newSentence)
+	translatedWords := make([]string, len(sentenceWords))
+	for i, word := range sentenceWords {
+		currentTranslatedWord, err := t.translate(word)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		translatedWords[i] = currentTranslatedWord
 	}
-	return translatedWords, nil
-}
-
-func (t *gopherTranslator) GetTranslateHistory() ([]string, error) {
-	//TODO implement me
-	panic("implement me")
+	translationStrBuilder := strings.Builder{}
+	translation := strings.Join(translatedWords, " ")
+	translationStrBuilder.WriteString(translation)
+	translationStrBuilder.WriteRune(end)
+	t.historySvc.Add(ctx, sentence, translationStrBuilder.String())
+	return translationStrBuilder.String(), nil
 }
 
 type translatorRule struct {
 	Apply func(word string) (string, bool)
 }
 
-func NewGopherTranslator(historySvc HistoryManager) Translator {
+func NewGopherTranslator(historySvc history.Manager) Manager {
 	return &gopherTranslator{
 		historySvc:      historySvc,
 		translatorRules: createTranslatorRules(),
 	}
 }
 
-func (t *gopherTranslator) Translate(word string) (string, error) {
+func (t *gopherTranslator) Translate(ctx context.Context, word string) (string, error) {
+	translation, err := t.translate(word)
+	if err != nil {
+		return "", err
+	}
+	t.historySvc.Add(ctx, word, translation)
+	return translation, nil
+}
+
+func (t *gopherTranslator) translate(word string) (string, error) {
 	if len(word) > 0 {
 		if strings.Contains(word, "'") {
 			return word, ErrShortenedWord
@@ -69,7 +73,6 @@ func (t *gopherTranslator) Translate(word string) (string, error) {
 		for _, rule := range t.translatorRules {
 			translatedWord, applied := rule.Apply(word)
 			if applied {
-				t.historySvc.Add(word, translatedWord)
 				return translatedWord, nil
 			}
 		}
@@ -90,6 +93,7 @@ func containsNumber(word string) bool {
 func createTranslatorRules() []*translatorRule {
 	var vowels = map[rune]struct{}{
 		'a': {}, 'e': {}, 'i': {}, 'o': {}, 'u': {},
+		'A': {}, 'E': {}, 'I': {}, 'O': {}, 'U': {},
 	}
 	rules := make([]*translatorRule, 3)
 	rules[0] = &translatorRule{
@@ -108,7 +112,7 @@ func createTranslatorRules() []*translatorRule {
 	rules[1] = &translatorRule{
 		Apply: func(word string) (string, bool) {
 			builder := strings.Builder{}
-			if strings.HasPrefix(word, "xr") {
+			if strings.HasPrefix(word, "xr") || strings.HasPrefix(word, "XR") {
 				builder.WriteString("ge")
 				builder.WriteString(word)
 				return builder.String(), true
