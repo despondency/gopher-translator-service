@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"gopher-translator-service/internal/translator"
+
 	"net/http"
 )
 
@@ -73,7 +74,7 @@ func (th *TranslatorHandler) TranslateWord() echo.HandlerFunc {
 		}
 		var gopherWordResponse GopherWordResponse
 		gopherWordResponse.GopherWord = translation
-		return c.JSON(http.StatusOK, &gopherWordResponse)
+		return c.JSON(http.StatusOK, gopherWordResponse)
 	}
 }
 

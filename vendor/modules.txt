@@ -42,6 +42,9 @@ github.com/containerd/containerd/errdefs
 github.com/containerd/containerd/log
 github.com/containerd/containerd/platforms
 github.com/containerd/containerd/sys
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
 # github.com/docker/distribution v2.7.1+incompatible
 ## explicit
 github.com/docker/distribution/digestset
@@ -91,6 +94,9 @@ github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 # github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
 ## explicit
 github.com/golang/groupcache/lru
+# github.com/golang/mock v1.6.0
+## explicit; go 1.11
+github.com/golang/mock/gomock
 # github.com/golang/protobuf v1.5.2
 ## explicit; go 1.9
 github.com/golang/protobuf/proto
@@ -143,9 +149,15 @@ github.com/opencontainers/runc/libcontainer/user
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+## explicit
+github.com/pmezard/go-difflib/difflib
 # github.com/sirupsen/logrus v1.8.1
 ## explicit; go 1.13
 github.com/sirupsen/logrus
+# github.com/stretchr/testify v1.7.1
+## explicit; go 1.13
+github.com/stretchr/testify/assert
 # github.com/testcontainers/testcontainers-go v0.12.0
 ## explicit; go 1.13
 github.com/testcontainers/testcontainers-go
@@ -231,3 +243,6 @@ google.golang.org/protobuf/types/known/timestamppb
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit; go 1.15
 gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+## explicit
+gopkg.in/yaml.v3

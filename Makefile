@@ -12,3 +12,6 @@ build-image:
 
 run:
 	docker-compose -f ./deployments/docker-compose-local.yml up --build --force-recreate
+
+generate:
+	go generate ./...
