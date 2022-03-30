@@ -9,7 +9,7 @@ REST service which transforms English words to gopher language using predefined 
     4. cURL (if you want to kick off with some requests)
 
 ### Start service:
-######(will default to 8080)
+(will default to 8080)
    ```
    make run
    ```
