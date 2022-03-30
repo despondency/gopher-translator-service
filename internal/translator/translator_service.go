@@ -17,13 +17,31 @@ func (t *gopherTranslator) TranslateSentence(ctx context.Context, sentence strin
 	newSentence := strings.ReplaceAll(sentence, string(end), "")
 	sentenceWords := strings.Fields(newSentence)
 	translatedWords := make([]string, len(sentenceWords))
+	commas := make([]bool, len(sentenceWords))
+	for i, word := range sentenceWords {
+		if strings.HasSuffix(word, ",") {
+			commas[i] = true
+			sentenceWords[i] = strings.ReplaceAll(sentenceWords[i], ",", "")
+		}
+	}
 	for i, word := range sentenceWords {
 		currentTranslatedWord := t.translate(word)
 		translatedWords[i] = currentTranslatedWord
 	}
 	translationStrBuilder := strings.Builder{}
-	translation := strings.Join(translatedWords, " ")
-	translationStrBuilder.WriteString(translation)
+	translation := strings.Builder{}
+	for i, word := range translatedWords {
+		if commas[i] {
+			translation.WriteString(word)
+			translation.WriteString(", ")
+		} else {
+			translation.WriteString(word)
+			if i+1 < len(translatedWords) {
+				translation.WriteString(" ")
+			}
+		}
+	}
+	translationStrBuilder.WriteString(translation.String())
 	translationStrBuilder.WriteRune(end)
 	t.historySvc.Add(ctx, sentence, translationStrBuilder.String())
 	return translationStrBuilder.String()

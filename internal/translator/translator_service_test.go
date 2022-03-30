@@ -56,11 +56,10 @@ func TestGopherTranslator_TranslateSentence(t *testing.T) {
 			"gapple gear goak guser gexray airchogo aresquogo xxxxxxxxqquogo gaaaaplequ!"},
 		{"Apples grow on trees.",
 			"gApples owgrogo gon eestrogo."},
-		// TODO
-		//{"i am sure, that, this is, the one.",
-		//	"gi gam ure,sogo at,thogo isthogo gis, ethogo gone."},
-		//{"i am sure that this is the one.",
-		//	"gi gam uresogo atthogo isthogo gis ethogo gone."},
+		{"i am sure, that, this is, the one.",
+			"gi gam uresogo, atthogo, isthogo gis, ethogo gone."},
+		{"I am a true, true legend!",
+			"gI gam ga uetrogo, uetrogo egendlogo!"},
 	}
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%s,%s", tt.input, tt.expected)

@@ -11,6 +11,7 @@ var ErrContainsDigits = fmt.Errorf("cannot understand words with digits")
 var ErrEmpty = fmt.Errorf("cannot translate empty words")
 var ErrInvalidSentence = fmt.Errorf("sentence does not end in (.?!)")
 var ErrNotEnglish = fmt.Errorf("only english sentences can be translated")
+var ErrMalformedCommas = fmt.Errorf("commas are malformed")
 
 type TranslatorRequestValidator struct {
 }
@@ -48,11 +49,24 @@ func (trv *TranslatorRequestValidator) validate(s string) error {
 	if !isOnlyEnglishLetters(s) {
 		return ErrNotEnglish
 	}
+	if hasMalformedCommas(s) {
+		return ErrMalformedCommas
+	}
 	return nil
 }
 
-func containsNumber(word string) bool {
-	for _, r := range word {
+func hasMalformedCommas(s string) bool {
+	for i, c := range s {
+		// if we have , and next is not space
+		if i+1 < len(s) && c == ',' && !unicode.IsSpace(rune(s[i+1])) {
+			return true
+		}
+	}
+	return false
+}
+
+func containsNumber(s string) bool {
+	for _, r := range s {
 		if unicode.IsDigit(r) {
 			return true
 		}
