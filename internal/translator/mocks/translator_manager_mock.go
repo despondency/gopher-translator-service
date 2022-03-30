@@ -35,12 +35,11 @@ func (m *GopherTranslator) EXPECT() *GopherTranslatorMockRecorder {
 }
 
 // Translate mocks base method.
-func (m *GopherTranslator) Translate(ctx context.Context, word string) (string, error) {
+func (m *GopherTranslator) Translate(ctx context.Context, word string) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Translate", ctx, word)
 	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret0
 }
 
 // Translate indicates an expected call of Translate.
@@ -50,12 +49,11 @@ func (mr *GopherTranslatorMockRecorder) Translate(ctx, word interface{}) *gomock
 }
 
 // TranslateSentence mocks base method.
-func (m *GopherTranslator) TranslateSentence(ctx context.Context, sentence string) (string, error) {
+func (m *GopherTranslator) TranslateSentence(ctx context.Context, sentence string) string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TranslateSentence", ctx, sentence)
 	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret0
 }
 
 // TranslateSentence indicates an expected call of TranslateSentence.

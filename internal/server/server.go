@@ -23,7 +23,7 @@ func NewServer() *Server {
 
 func (s *Server) Run() {
 	historySvc := history.NewHistoryService()
-	translatorSvc := translator.NewGopherTranslator(history.NewHistoryService())
+	translatorSvc := translator.NewGopherTranslator(historySvc)
 	translatorHandler := v1.NewTranslatorHandler(translatorSvc)
 	historyHandler := v1.NewHistoryHandler(historySvc)
 	s.e.Add(echo.GET, "/v1/health", createHealth())

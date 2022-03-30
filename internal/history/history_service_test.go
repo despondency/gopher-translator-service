@@ -11,61 +11,31 @@ func TestHistoryService(t *testing.T) {
 	var toAdd = []struct {
 		word, translation string
 	}{
-		{"apple", "gapple"},
-		{"ear", "gear"},
-		{"oak", "goak"},
-		{"user", "guser"},
-		{"xray", "gexray"},
-		{"chair", "airchogo"},
-		{"square", "aresquogo"},
-		{"xxxxxxxxqqu", "xxxxxxxxqquogo"},
-		{"aaaaplequ", "gaaaaplequ"},
+		{"c", "h"},
+		{"b", "h"},
+		{"a", "h"},
 	}
 	for _, curr := range toAdd {
 		historySvc.Add(ctx, curr.word, curr.translation)
 	}
 	translatedWordsActual := historySvc.GetTranslationHistory(ctx)
-	compareSortedHistory(t, translatedWordsActual, []*Entry{
+	compareHistory(t, translatedWordsActual, []*Entry{
 		{
-			Word:        "aaaaplequ",
-			Translation: "gaaaaplequ",
+			Word:        "a",
+			Translation: "h",
 		},
 		{
-			Word:        "apple",
-			Translation: "gapple",
+			Word:        "b",
+			Translation: "h",
 		},
 		{
-			Word:        "chair",
-			Translation: "airchogo",
-		},
-		{
-			Word:        "ear",
-			Translation: "gear",
-		},
-		{
-			Word:        "oak",
-			Translation: "goak",
-		},
-		{
-			Word:        "square",
-			Translation: "aresquogo",
-		},
-		{
-			Word:        "user",
-			Translation: "guser",
-		},
-		{
-			Word:        "xray",
-			Translation: "gexray",
-		},
-		{
-			Word:        "xxxxxxxxqqu",
-			Translation: "xxxxxxxxqquogo",
+			Word:        "c",
+			Translation: "h",
 		},
 	})
 }
 
-func compareSortedHistory(t *testing.T, actual []*Entry, expected []*Entry) {
+func compareHistory(t *testing.T, actual []*Entry, expected []*Entry) {
 	if len(actual) != len(expected) {
 		t.Errorf("got %d len, want %d len", len(actual), len(expected))
 	}

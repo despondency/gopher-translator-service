@@ -4,16 +4,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/labstack/echo/v4"
 	v1 "gopher-translator-service/internal/api/v1"
 	"io/ioutil"
 	"net/http"
 )
 
 type TestClient struct {
+	client *http.Client
 }
 
 func NewTestClient() *TestClient {
-	return &TestClient{}
+	return &TestClient{
+		client: &http.Client{},
+	}
 }
 
 func (c *TestClient) Translate(uri string, req *v1.GopherWordRequest) (*v1.GopherWordResponse, error) {
@@ -22,13 +26,17 @@ func (c *TestClient) Translate(uri string, req *v1.GopherWordRequest) (*v1.Gophe
 		return nil, err
 	}
 	body := bytes.NewBuffer(b)
-	resp, err := http.Post(fmt.Sprintf(uri+"/v1/word"), "application/json", body)
+	httpReq, err := http.NewRequest(http.MethodPost, fmt.Sprintf(uri+"/v1/word"), body)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		resp.Body.Close()
-	}()
+	httpReq.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	httpReq.Close = true
+	resp, err := c.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -50,13 +58,17 @@ func (c *TestClient) TranslateSentence(uri string, req *v1.GopherSentenceRequest
 		return nil, err
 	}
 	body := bytes.NewBuffer(b)
-	resp, err := http.Post(fmt.Sprintf(uri+"/v1/sentence"), "application/json", body)
+	httpReq, err := http.NewRequest(http.MethodPost, fmt.Sprintf(uri+"/v1/sentence"), body)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		resp.Body.Close()
-	}()
+	httpReq.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	httpReq.Close = true
+	resp, err := c.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -67,4 +79,28 @@ func (c *TestClient) TranslateSentence(uri string, req *v1.GopherSentenceRequest
 		return nil, err
 	}
 	return translatedWord, nil
+}
+
+func (c *TestClient) GetTranslationHistory(uri string) (*v1.TranslationHistory, error) {
+	httpReq, err := http.NewRequest(http.MethodGet, fmt.Sprintf(uri+"/v1/history"), nil)
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	httpReq.Close = true
+	resp, err := c.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	translationHistory := &v1.TranslationHistory{}
+	err = json.Unmarshal(respBody, translationHistory)
+	if err != nil {
+		return nil, err
+	}
+	return translationHistory, nil
 }

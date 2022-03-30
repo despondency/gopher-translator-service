@@ -2,36 +2,23 @@ package translator
 
 import (
 	"context"
-	"fmt"
 	"gopher-translator-service/internal/history"
 	"strings"
-	"unicode"
 )
-
-var ErrShortenedWord = fmt.Errorf("cannot understand words with '")
-var ErrContainsDigits = fmt.Errorf("cannot understand words with digits")
-var ErrEmptyWord = fmt.Errorf("cannot translate empty words")
-var ErrInvalidSentence = fmt.Errorf("sentence does not end in (.?!)")
 
 type gopherTranslator struct {
 	translatorRules []*translatorRule
 	historySvc      history.Manager
 }
 
-func (t *gopherTranslator) TranslateSentence(ctx context.Context, sentence string) (string, error) {
-	if !strings.HasSuffix(sentence, "!") && !strings.HasSuffix(sentence, "?") && !strings.HasSuffix(sentence, ".") {
-		return "", ErrInvalidSentence
-	}
+func (t *gopherTranslator) TranslateSentence(ctx context.Context, sentence string) string {
 	endsWith := []rune(sentence)
 	end := endsWith[len(sentence)-1]
 	newSentence := strings.ReplaceAll(sentence, string(end), "")
 	sentenceWords := strings.Fields(newSentence)
 	translatedWords := make([]string, len(sentenceWords))
 	for i, word := range sentenceWords {
-		currentTranslatedWord, err := t.translate(word)
-		if err != nil {
-			return "", err
-		}
+		currentTranslatedWord := t.translate(word)
 		translatedWords[i] = currentTranslatedWord
 	}
 	translationStrBuilder := strings.Builder{}
@@ -39,7 +26,7 @@ func (t *gopherTranslator) TranslateSentence(ctx context.Context, sentence strin
 	translationStrBuilder.WriteString(translation)
 	translationStrBuilder.WriteRune(end)
 	t.historySvc.Add(ctx, sentence, translationStrBuilder.String())
-	return translationStrBuilder.String(), nil
+	return translationStrBuilder.String()
 }
 
 type translatorRule struct {
@@ -53,41 +40,20 @@ func NewGopherTranslator(historySvc history.Manager) Manager {
 	}
 }
 
-func (t *gopherTranslator) Translate(ctx context.Context, word string) (string, error) {
-	translation, err := t.translate(word)
-	if err != nil {
-		return "", err
-	}
+func (t *gopherTranslator) Translate(ctx context.Context, word string) string {
+	translation := t.translate(word)
 	t.historySvc.Add(ctx, word, translation)
-	return translation, nil
+	return translation
 }
 
-func (t *gopherTranslator) translate(word string) (string, error) {
-	if len(word) > 0 {
-		if strings.Contains(word, "'") {
-			return word, ErrShortenedWord
-		}
-		if containsNumber(word) {
-			return word, ErrContainsDigits
-		}
-		for _, rule := range t.translatorRules {
-			translatedWord, applied := rule.Apply(word)
-			if applied {
-				return translatedWord, nil
-			}
+func (t *gopherTranslator) translate(word string) string {
+	for _, rule := range t.translatorRules {
+		translatedWord, applied := rule.Apply(word)
+		if applied {
+			return translatedWord
 		}
 	}
-	return word, ErrEmptyWord
-}
-
-func containsNumber(word string) bool {
-	runes := []rune(word)
-	for _, r := range runes {
-		if unicode.IsDigit(r) {
-			return true
-		}
-	}
-	return false
+	return word
 }
 
 func createTranslatorRules() []*translatorRule {
@@ -132,7 +98,6 @@ func createTranslatorRules() []*translatorRule {
 					if _, ok = vowels[runes[end]]; ok {
 						break
 					}
-					end++
 				}
 				// check if the last match is a 'q', check next if its vowel 'u' to get special 'qu'
 				if end > 1 && runes[end-1] == 'q' && runes[end] == 'u' {

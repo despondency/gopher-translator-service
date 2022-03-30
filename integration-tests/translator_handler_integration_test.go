@@ -2,11 +2,9 @@ package integration_tests
 
 import (
 	"context"
-	"fmt"
 	testClientV1 "gopher-translator-service/integration-tests/client/v1"
 	"gopher-translator-service/integration-tests/helper"
 	v1 "gopher-translator-service/internal/api/v1"
-	"net/http"
 	"testing"
 )
 
@@ -16,6 +14,7 @@ func TestTranslateWord(t *testing.T) {
 		panic(err)
 	}
 	testClient := testClientV1.NewTestClient()
+	defer container.Terminate(context.Background())
 	var tests = []struct {
 		input    *v1.GopherWordRequest
 		expected *v1.GopherWordResponse
@@ -38,7 +37,6 @@ func TestTranslateWord(t *testing.T) {
 			t.Errorf("expected %v, got %v", tt.expected, resp)
 		}
 	}
-	container.Terminate(context.Background())
 }
 
 func TestTranslateSentence(t *testing.T) {
@@ -70,13 +68,4 @@ func TestTranslateSentence(t *testing.T) {
 		}
 	}
 	container.Terminate(context.Background())
-}
-
-func statusOK() func(status int) error {
-	return func(status int) error {
-		if status != http.StatusOK {
-			return fmt.Errorf("expected status OK")
-		}
-		return nil
-	}
 }
