@@ -57,18 +57,17 @@ func (t *gopherTranslator) translate(word string) string {
 }
 
 func createTranslatorRules() []*translatorRule {
-	var vowels = map[rune]struct{}{
-		'a': {}, 'e': {}, 'i': {}, 'o': {}, 'u': {},
-		'A': {}, 'E': {}, 'I': {}, 'O': {}, 'U': {},
+	var vowels = map[string]struct{}{
+		"a": {}, "e": {}, "i": {}, "o": {}, "u": {},
+		"A": {}, "E": {}, "I": {}, "O": {}, "U": {},
 	}
 	rules := make([]*translatorRule, 3)
 	rules[0] = &translatorRule{
 		Apply: func(word string) (string, bool) {
-			runes := []rune(word)
-			if _, ok := vowels[runes[0]]; ok {
+			if _, ok := vowels[string(word[0])]; ok {
 				builder := strings.Builder{}
 				// starts with vowel
-				builder.WriteRune('g')
+				builder.WriteString("g")
 				builder.WriteString(word)
 				return builder.String(), true
 			}
@@ -88,19 +87,18 @@ func createTranslatorRules() []*translatorRule {
 	}
 	rules[2] = &translatorRule{
 		Apply: func(word string) (string, bool) {
-			runes := []rune(word)
-			if _, ok := vowels[runes[0]]; !ok {
+			if _, ok := vowels[string(word[0])]; !ok {
 				builder := strings.Builder{}
 				// starts with consonant
 				var end = 0
 				// get end of the consonant sound
-				for ; end < len(runes); end++ {
-					if _, ok = vowels[runes[end]]; ok {
+				for ; end < len(word); end++ {
+					if _, ok = vowels[string(word[end])]; ok {
 						break
 					}
 				}
 				// check if the last match is a 'q', check next if its vowel 'u' to get special 'qu'
-				if end > 1 && runes[end-1] == 'q' && runes[end] == 'u' {
+				if end > 1 && string(word[end-1]) == "q" && string(word[end]) == "u" {
 					// we have special 'qu'
 					end++
 					builder.WriteString(word[end:])

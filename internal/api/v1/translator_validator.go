@@ -11,6 +11,7 @@ var ErrContainsDigits = fmt.Errorf("cannot understand words with digits")
 var ErrEmpty = fmt.Errorf("cannot translate empty words")
 var ErrInvalidSentence = fmt.Errorf("sentence does not end in (.?!)")
 var ErrNotEnglish = fmt.Errorf("only english sentences can be translated")
+var ErrMalformedSentence = fmt.Errorf("malformed sentence")
 
 type TranslatorRequestValidator struct {
 }
