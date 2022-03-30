@@ -98,7 +98,7 @@ func createTranslatorRules() []*translatorRule {
 					}
 				}
 				// check if the last match is a 'q', check next if its vowel 'u' to get special 'qu'
-				if end > 1 && string(word[end-1]) == "q" && string(word[end]) == "u" {
+				if end > 1 && word[end-1] == 'q' && word[end] == 'u' {
 					// we have special 'qu'
 					end++
 					builder.WriteString(word[end:])

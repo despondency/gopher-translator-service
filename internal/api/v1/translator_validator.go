@@ -11,7 +11,6 @@ var ErrContainsDigits = fmt.Errorf("cannot understand words with digits")
 var ErrEmpty = fmt.Errorf("cannot translate empty words")
 var ErrInvalidSentence = fmt.Errorf("sentence does not end in (.?!)")
 var ErrNotEnglish = fmt.Errorf("only english sentences can be translated")
-var ErrMalformedSentence = fmt.Errorf("malformed sentence")
 
 type TranslatorRequestValidator struct {
 }
@@ -53,8 +52,7 @@ func (trv *TranslatorRequestValidator) validate(s string) error {
 }
 
 func containsNumber(word string) bool {
-	runes := []rune(word)
-	for _, r := range runes {
+	for _, r := range word {
 		if unicode.IsDigit(r) {
 			return true
 		}
