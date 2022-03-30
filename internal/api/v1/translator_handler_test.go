@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestTranslateWord(t *testing.T) {
+func Test_TranslateWord(t *testing.T) {
 	var tests = []struct {
 		mockInput  string
 		mockOutput string
@@ -73,7 +73,7 @@ func TestTranslateWord(t *testing.T) {
 	}
 }
 
-func TestTranslateSentence(t *testing.T) {
+func Test_TranslateSentence(t *testing.T) {
 	var tests = []struct {
 		mockInput  string
 		mockOutput string

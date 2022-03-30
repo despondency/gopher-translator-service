@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestMemoryStorageStore(t *testing.T) {
+func TestMemoryStorage_StoreAndGet(t *testing.T) {
 	store := NewMemoryStorage()
 	var tests = []struct {
 		word, translation string

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestHistoryService(t *testing.T) {
+func TestHistoryService_Add(t *testing.T) {
 	historySvc := NewHistoryService()
 	ctx := context.Background()
 	var toAdd = []struct {

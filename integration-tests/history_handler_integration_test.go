@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestGetTranslationHistory(t *testing.T) {
+func Test_GetTranslationHistory(t *testing.T) {
 	container, err := helper.SetupService(context.Background())
 	if err != nil {
 		panic(err)

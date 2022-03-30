@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGopherTranslatorTranslateErrors(t *testing.T) {
+func TestGopherTranslator_TranslateErrors(t *testing.T) {
 	tr := NewTranslatorRequestValidator()
 	var tests = []struct {
 		input    *GopherWordRequest
@@ -31,7 +31,7 @@ func TestGopherTranslatorTranslateErrors(t *testing.T) {
 	}
 }
 
-func TestGopherTranslatorTranslateSentenceErrors(t *testing.T) {
+func TestGopherTranslator_TranslateSentenceErrors(t *testing.T) {
 	tr := NewTranslatorRequestValidator()
 	var tests = []struct {
 		input    *GopherSentenceRequest
