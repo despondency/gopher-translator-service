@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	v1 "gopher-translator-service/internal/api/v1"
 	"gopher-translator-service/internal/history"
@@ -10,14 +11,14 @@ import (
 )
 
 type Server struct {
-	e           *echo.Echo
-	stopperChan chan struct{}
+	e    *echo.Echo
+	port int
 }
 
-func NewServer() *Server {
+func NewServer(port int) *Server {
 	return &Server{
-		e:           echo.New(),
-		stopperChan: make(chan struct{}),
+		e:    echo.New(),
+		port: port,
 	}
 }
 
@@ -30,7 +31,7 @@ func (s *Server) Run() {
 	s.e.Add(echo.POST, "/v1/word", translatorHandler.TranslateWord())
 	s.e.Add(echo.POST, "/v1/sentence", translatorHandler.TranslateSentence())
 	s.e.Add(echo.GET, "/v1/history", historyHandler.GetTranslationHistory())
-	log.Fatalln(s.e.Start(":8080"))
+	log.Fatalln(s.e.Start(fmt.Sprintf(":%d", s.port)))
 }
 
 func (s *Server) Stop(ctx context.Context) {

@@ -10,7 +10,7 @@ test-integration:
 build-image:
 	docker build . -f build/Dockerfile -t gopher-translator-service:1.0
 
-run:
+run-container:
 	docker-compose -f ./deployments/docker-compose-local.yml up --build --force-recreate
 
 generate:

@@ -39,6 +39,7 @@ func TestGopherTranslatorTranslateSentenceErrors(t *testing.T) {
 	}{
 		{&GopherSentenceRequest{EnglishSentence: ""}, ErrEmpty},
 		{&GopherSentenceRequest{EnglishSentence: "heeeey its me"}, ErrInvalidSentence},
+		{&GopherSentenceRequest{EnglishSentence: "ė"}, ErrNotEnglish},
 	}
 	for _, tt := range tests {
 		testName := fmt.Sprintf("%s,%s", tt.input, tt.expected)

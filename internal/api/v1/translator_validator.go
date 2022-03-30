@@ -10,6 +10,7 @@ var ErrShortened = fmt.Errorf("cannot understand words with '")
 var ErrContainsDigits = fmt.Errorf("cannot understand words with digits")
 var ErrEmpty = fmt.Errorf("cannot translate empty words")
 var ErrInvalidSentence = fmt.Errorf("sentence does not end in (.?!)")
+var ErrNotEnglish = fmt.Errorf("only english sentences can be translated")
 
 type TranslatorRequestValidator struct {
 }
@@ -44,6 +45,9 @@ func (trv *TranslatorRequestValidator) validate(s string) error {
 	if containsNumber(s) {
 		return ErrContainsDigits
 	}
+	if !isOnlyEnglishLetters(s) {
+		return ErrNotEnglish
+	}
 	return nil
 }
 
@@ -55,4 +59,16 @@ func containsNumber(word string) bool {
 		}
 	}
 	return false
+}
+
+const alpha = "abcdefghijklmnopqrstuvwxyz"
+
+func isOnlyEnglishLetters(s string) bool {
+	for _, char := range s {
+		if char != '?' && char != ',' && char != '.' && char != '!' && char != ' ' &&
+			!strings.Contains(alpha, strings.ToLower(string(char))) {
+			return false
+		}
+	}
+	return true
 }
