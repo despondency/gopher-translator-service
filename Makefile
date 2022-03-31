@@ -15,3 +15,6 @@ run-container:
 
 generate:
 	go generate ./...
+
+lint:
+	golangci-lint run --skip-files _test\.go
